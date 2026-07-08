@@ -1,6 +1,6 @@
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
-
+const jwt = require("jsonwebtoken");
 // ================= REGISTER USER =================
 const registerUser = async (req, res) => {
     try {
@@ -76,15 +76,28 @@ const loginUser = async (req, res) => {
             });
         }
 
+        // Generate JWT Token
+        const token = jwt.sign(
+        {
+            id: user.id
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: "24h"
+        }
+    );
+
+        // Login successful
         return res.status(200).json({
-            success: true,
-            message: "Login Successful",
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email
-            }
-        });
+        success: true,
+        message: "Login Successful",
+        token,
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+        }
+    });
 
     } catch (error) {
         console.error(error);
@@ -95,9 +108,29 @@ const loginUser = async (req, res) => {
         });
     }
 };
+// ================= USER PROFILE =================
+const getUserProfile = async (req, res) => {
+    try {
 
+        return res.status(200).json({
+            success: true,
+            message: "Protected Route Accessed Successfully",
+            loggedInUser: req.user
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};
 // ================= EXPORT =================
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    getUserProfile
 };
