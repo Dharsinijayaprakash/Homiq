@@ -1,9 +1,11 @@
+const applianceRoutes = require("./routes/applianceRoutes");
 const express = require("express");
 require("dotenv").config();
 
 console.log(process.env.DB_USER);
 console.log(process.env.DB_PASSWORD);
 console.log(process.env.DB_NAME);
+console.log(process.env.JWT_SECRET);
 const pool = require("./config/db");
 const app = express();
 
@@ -11,7 +13,7 @@ app.use(express.json());
 
 // Import Routes
 const userRoutes = require("./routes/userRoutes");
-
+const maintenanceRoutes = require("./routes/maintenanceRoutes");
 // Home Route
 app.get("/", (req, res) => {
     res.send("HomePulse AI Backend");
@@ -19,6 +21,8 @@ app.get("/", (req, res) => {
 
 // Use Routes
 app.use("/api/users", userRoutes);
+app.use("/api/appliances", applianceRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
 pool.connect()
     .then(() => {
         console.log("✅ PostgreSQL Connected Successfully!");

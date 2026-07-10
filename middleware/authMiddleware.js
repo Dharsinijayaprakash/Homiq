@@ -18,6 +18,7 @@ const authenticateUser = (req, res, next) => {
         const token = authHeader.split(" ")[1];
 
         // Verify Token
+        console.log("Middleware Secret:", process.env.JWT_SECRET);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Save user id inside request
