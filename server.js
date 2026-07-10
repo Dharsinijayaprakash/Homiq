@@ -14,6 +14,7 @@ app.use(express.json());
 // Import Routes
 const userRoutes = require("./routes/userRoutes");
 const maintenanceRoutes = require("./routes/maintenanceRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 // Home Route
 app.get("/", (req, res) => {
     res.send("HomePulse AI Backend");
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/appliances", applianceRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 pool.connect()
     .then(() => {
         console.log("✅ PostgreSQL Connected Successfully!");
