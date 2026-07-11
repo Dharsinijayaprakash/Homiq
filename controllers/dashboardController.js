@@ -110,7 +110,102 @@ const getWarrantyExpiring = async (req, res) => {
     }
 
 };
+const getRecentMaintenance = async (req, res) => {
+
+    try {
+
+        const userId = req.user.id;
+
+        const result = await pool.query(
+            `
+            SELECT
+                mh.id,
+                mh.service_date,
+                mh.service_type,
+                mh.cost,
+                a.name AS appliance_name,
+                a.brand
+            FROM maintenance_history mh
+            JOIN appliances a
+            ON mh.appliance_id = a.id
+            WHERE a.user_id = $1
+            ORDER BY mh.service_date DESC
+            LIMIT 5
+            `,
+            [userId]
+        );
+
+        return res.status(200).json({
+            success: true,
+            count: result.rows.length,
+            maintenance: result.rows
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+
+    }
+
+};
+const getUpcomingServices = async (req, res) => {
+
+    try {
+
+        const userId = req.user.id;
+
+        const result = await pool.query(
+            `
+            SELECT
+                mh.id,
+                mh.next_service_date,
+                mh.service_type,
+                a.name AS appliance_name,
+                a.brand
+            FROM maintenance_history mh
+            JOIN appliances a
+            ON mh.appliance_id = a.id
+            WHERE a.user_id = $1
+            AND mh.next_service_date BETWEEN CURRENT_DATE
+            AND CURRENT_DATE + INTERVAL '30 days'
+            ORDER BY mh.next_service_date ASC
+            `,
+            [userId]
+        );
+
+        return res.status(200).json({
+
+            success: true,
+
+            count: result.rows.length,
+
+            services: result.rows
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+
+            success: false,
+            message: "Internal Server Error"
+
+        });
+
+    }
+
+};
+
 module.exports = {
     getDashboardStats,
-    getWarrantyExpiring
+    getWarrantyExpiring,
+    getRecentMaintenance,
+    getUpcomingServices
 };
